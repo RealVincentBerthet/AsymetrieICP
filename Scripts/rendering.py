@@ -8,6 +8,15 @@ def get_csv_args():
     args = parser.parse_args()
     return args.filename
 
+def DrawAxes(renderer):
+    transform = vtk.vtkTransform()
+    transform.Translate(0.0, 0.0, 0.0)
+
+    axes = vtk.vtkAxesActor()
+    axes.SetUserTransform(transform)
+
+    renderer.AddActor(axes)
+
 def DrawPoint(p,renderer,color):
     # Create the geometry of a point (the coordinate)
     points = vtk.vtkPoints()
@@ -33,7 +42,26 @@ def DrawPoint(p,renderer,color):
     actor = vtk.vtkActor()
     actor.SetMapper(mapper)
     actor.GetProperty().SetColor(color)
-    actor.GetProperty().SetPointSize(20)
+    actor.GetProperty().SetPointSize(1)
+
+    renderer.AddActor(actor)
+
+def DrawPlan(renderer,color):
+    # Create a plane
+    planeSource = vtk.vtkPlaneSource()
+    planeSource.SetCenter(10, 10, 10)
+    planeSource.SetNormal(10, 2, 3)
+    planeSource.Update()
+
+    plane = planeSource.GetOutput()
+
+    # Create a mapper and actor
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputData(plane)
+
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+    actor.GetProperty().SetColor(color)
 
     renderer.AddActor(actor)
 
@@ -52,8 +80,11 @@ def main():
         reader = csv.reader(csvfile, delimiter=',')
         for row in reader:
             if (row[0]!="Points:0"):
-                data.append(row)
-    
+                tmp=[]
+                for s in row :
+                    tmp.append(float(s))
+                data.append(tmp)
+
     ## Rendering
     colors = vtk.vtkNamedColors()
     colors.SetColor("BackgroundColor", [26, 51, 77, 255])
@@ -67,9 +98,15 @@ def main():
     renderWindowInteractor.SetRenderWindow(renderWindow)
     #endregion
 
-    # Draw cloud point from CSV
-    DrawPoint([1.0, 2.0, 3.0],renderer,colors.GetColor3d("Tomato"))
-    DrawPoint([2.0, 2.0, 3.0],renderer,colors.GetColor3d("DarkGreen"))
+    #@TODO ALGO
+    #DrawAxes(renderer)
+    # Draw cloud point from CSV    
+    for p in data :
+        DrawPoint(p,renderer,colors.GetColor3d("Tomato")) #@TODO optim avec un actor
+
+    # Draw plane
+    #DrawPlan(renderer,colors.GetColor3d("Cyan"))
+
 
     # Render and interact
     renderWindow.Render()
