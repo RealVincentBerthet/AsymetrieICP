@@ -2,10 +2,13 @@ import csv
 import vtk
 
 # Read CSV
+# List of data
+data = []
 with open('./Data/ventricules.csv', newline='') as csvfile:
-    reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+    reader = csv.reader(csvfile, delimiter=',')
     for row in reader:
-        print(row)
+        if (row[0]!="Points:0"):
+            data.append(row)
 
 
 
