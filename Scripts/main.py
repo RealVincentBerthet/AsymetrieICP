@@ -21,8 +21,8 @@ def main():
 
     # Create a plane
     planeSource = vtk.vtkPlaneSource()
-    planeSource.SetCenter(1.0, 0.0, 0.0)
-    planeSource.SetNormal(1.0, 0.0, 1.0)
+    planeSource.SetCenter(10, 10, 10)
+    planeSource.SetNormal(10, 2, 3)
     planeSource.Update()
 
     plane = planeSource.GetOutput()
