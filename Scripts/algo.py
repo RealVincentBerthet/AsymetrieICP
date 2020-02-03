@@ -2,13 +2,7 @@ import numpy as np
 import scipy.spatial
 import scipy.linalg as la
 
-def compute_plane_test(planeSource, data):
-
-    # x = data
-
-    x = [[10,10,0], [-10,-10,0]]
-    x = np.array(x)
-
+def compute_plane(x):
     # Step 0 : Initialise plane
 
     # moyenne des points clouds pour trouver le centroid
@@ -22,8 +16,6 @@ def compute_plane_test(planeSource, data):
     c = np.array([1, 0, 0])
     # normale
     n = np.array([1, 0, 0])
-    planeSource.SetNormal(n)
-    planeSource.SetCenter(m)
     n = n / np.linalg.norm(n)
     print(n)
 
@@ -114,7 +106,8 @@ def compute_plane_test(planeSource, data):
         # Calcul d
         d = 1/2 * (xg + yg) * n
         print(d)
+        print("normal : "+str(n.tolist()))
+        print("center : "+str(m.tolist()))
 
 
-
-    return planeSource
+    return m.tolist(),n.tolist()
