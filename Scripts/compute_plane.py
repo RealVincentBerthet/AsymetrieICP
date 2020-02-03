@@ -19,12 +19,13 @@ def compute_plane_test(planeSource, data):
     # print(m)
 
     c = m
-    c = np.array([0, 0, 0])
+    c = np.array([1, 0, 0])
     # normale
-    n = np.array([1, 1, 0])
+    n = np.array([1, 0, 0])
     planeSource.SetNormal(n)
     planeSource.SetCenter(m)
-
+    n = n / np.linalg.norm(n)
+    print(n)
 
     # Step 1 :
 
@@ -32,10 +33,13 @@ def compute_plane_test(planeSource, data):
     # distance de l'origine
     o = np.array([0, 0, 0])
 
-    d = c
+    d = np.linalg.norm(c-o)
+    print(d)
+
     I3 = np.array([[1, 0, 0],
                  [0, 1, 0],
                  [0, 0, 1]])
+
 
     for iter in range(1):
 
@@ -44,7 +48,8 @@ def compute_plane_test(planeSource, data):
         # Projection
         y = []
         for i in range(len(x)):
-            tmp = (I3 - 2 * n @ n) @ x[i] + 2 * d @ n
+            tmp = (I3 - 2 * np.dot(np.array([n]).T,np.array([n]))) @ x[i] + 2 * d * n
+            # print(x[i])
             print(tmp)
             y.append(tmp)
 
