@@ -10,12 +10,13 @@ def Get_csv_args():
     args = parser.parse_args()
     return args.filename
 
-def DrawAxes(renderer):
+def DrawAxes(renderer,length):
+    axes = vtk.vtkAxesActor()
+    axes.AxisLabelsOff()
     transform = vtk.vtkTransform()
     transform.Translate(0.0, 0.0, 0.0)
-
-    axes = vtk.vtkAxesActor()
     axes.SetUserTransform(transform)
+    axes.SetTotalLength(length)
 
     renderer.AddActor(axes)
 
@@ -50,16 +51,30 @@ def DrawPoint(data,renderer,color,pointSize):
 
     renderer.AddActor(actor)
 
-def DrawPlan(renderer,color,center,normal,xSize,ySize):
+def DrawPlan(renderer,color,center,normal,scaleFactor):   
     # Create a plane
     planeSource = vtk.vtkPlaneSource()
-    planeSource.SetCenter(center)
+    planeSource.SetCenter(0,0,0)
     planeSource.SetNormal(normal)
-    planeSource.SetPoint1(xSize) #x
-    planeSource.SetPoint2(ySize) #y
     planeSource.Update()
+   
+    # Scale plane
+    scaleTransform=vtk.vtkTransform()
+    scaleTransform.Scale((scaleFactor))
+    scaleFilter = vtk.vtkTransformPolyDataFilter()
+    scaleFilter.SetInputConnection(planeSource.GetOutputPort())
+    scaleFilter.SetTransform(scaleTransform)
+    scaleFilter.Update()
 
-    plane = planeSource.GetOutput()
+    # Translate plane
+    translation = vtk.vtkTransform()
+    translation.Translate(center)
+    transformFilter = vtk.vtkTransformPolyDataFilter()
+    transformFilter.SetInputConnection(scaleFilter.GetOutputPort())
+    transformFilter.SetTransform(translation)
+    transformFilter.Update()
+
+    plane = transformFilter.GetOutput()
 
     # Create a mapper and actor
     mapper = vtk.vtkPolyDataMapper()
@@ -67,6 +82,7 @@ def DrawPlan(renderer,color,center,normal,xSize,ySize):
 
     actor = vtk.vtkActor()
     actor.SetMapper(mapper)
+    actor.GetProperty().SetRepresentationToWireframe() #plan unfilled
     actor.GetProperty().SetColor(color)
 
     renderer.AddActor(actor)
@@ -95,6 +111,7 @@ def main():
     colors = vtk.vtkNamedColors()
     colors.SetColor("BackgroundColor", [26, 51, 77, 255])
     # Create a rendering window and renderer
+
     renderer = vtk.vtkRenderer()
     renderer.SetBackground(colors.GetColor3d("BackgroundColor"))
     renderWindow = vtk.vtkRenderWindow()
@@ -104,15 +121,16 @@ def main():
     renderWindowInteractor.SetRenderWindow(renderWindow)
     #endregion
 
-    data = [[10,10,0], [-10,-10,0]]
-    data = np.array(data)
+    data = [[10,10,0], [-10,-10,0]] #DEBUG
+    data = np.array(data) #DEBUG
     center,normal=algo.compute_plane(data)
-    DrawPoint([center],renderer,colors.GetColor3d("DarkGreen"),5.0)
-    #DrawAxes(renderer)
+    DrawPoint([center],renderer,colors.GetColor3d("DarkGreen"),10.0)
+    DrawAxes(renderer,(5,5,5))
     # Draw cloud point from CSV    
-    DrawPoint(data,renderer,colors.GetColor3d("Tomato"),20.0)
+    #DrawPoint(data,renderer,colors.GetColor3d("Tomato"),1.0)
+    DrawPoint(data,renderer,colors.GetColor3d("Tomato"),20.0) #DEBUG
     # Draw plane
-    DrawPlan(renderer,colors.GetColor3d("Cyan"),center,normal,(10,0,0),(0,10,0)) #@TODO fix
+    DrawPlan(renderer,colors.GetColor3d("Cyan"),center,normal,(30,30,30))
     # Render and interact
     renderWindow.Render()
     renderWindowInteractor.Start()
