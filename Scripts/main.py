@@ -3,12 +3,47 @@ import csv
 import argparse
 import numpy as np
 import algo
+import os
 
 def Get_csv_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-f","--filename", help="CSV file use to draw cloud points")
     args = parser.parse_args()
-    return args.filename
+    scaleFactor=(1,1,1)
+    pointSize=1.0
+
+    if args.filename != None:
+        print("CSV Loaded : "+str(args.filename))
+    else:
+        print("No CSV loaded used -f argurment")
+        quit()
+
+    if os.path.basename(args.filename) == "ventricules.csv" :
+        scaleFactor=(100,100,100)
+    elif os.path.basename(args.filename) == "Visage_symetrique.csv" :
+        scaleFactor=(250,250,250)
+    elif os.path.basename(args.filename) == "Visage_symetrique_decimated.csv" :
+        scaleFactor=(250,250,250)
+    elif os.path.basename(args.filename) == "Visage_symetrique_deforme.csv" :
+        scaleFactor=(250,250,250)
+    elif os.path.basename(args.filename) == "Visage_symetrique_deforme_decimated.csv" :
+        scaleFactor=(250,250,250)
+    elif os.path.basename(args.filename) == "Demo.csv" :
+        scaleFactor=(30,30,30)
+        pointSize=20
+
+    #Load CSV Data    
+    data = []
+    with open(args.filename, newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+        for row in reader:
+            if (row[0]!="Points:0"):
+                tmp=[]
+                for s in row :
+                    tmp.append(float(s))
+                data.append(tmp)
+
+    return data,scaleFactor, pointSize
 
 def DrawAxes(renderer,length):
     axes = vtk.vtkAxesActor()
@@ -55,7 +90,6 @@ def DrawPlan(renderer,color,center,normal,scaleFactor):
     # Create a plane
     planeSource = vtk.vtkPlaneSource()
     planeSource.SetCenter(0,0,0)
-    # planeSource.SetNormal(0,1,-4)
     planeSource.SetNormal(normal)
     planeSource.Update()
    
@@ -89,25 +123,7 @@ def DrawPlan(renderer,color,center,normal,scaleFactor):
     renderer.AddActor(actor)
 
 def main():
-    #region Initialization
-    #Get filename from args
-    filename=Get_csv_args()
-    if filename != None:
-        print("CSV Loaded : "+str(filename))
-    else:
-        print("No CSV loaded used -f argurment")
-        return
-    #Load CSV Data    
-    data = []
-    with open(filename, newline='') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',')
-        for row in reader:
-            if (row[0]!="Points:0"):
-                tmp=[]
-                for s in row :
-                    tmp.append(float(s))
-                data.append(tmp)
-
+    data,scaleFactor,pointSize=Get_csv_args()
     ## Rendering
     colors = vtk.vtkNamedColors()
     colors.SetColor("BackgroundColor", [26, 51, 77, 255])
@@ -122,16 +138,13 @@ def main():
     renderWindowInteractor.SetRenderWindow(renderWindow)
     #endregion
 
-    data = [[10,10,0], [-6,-6,0]] #DEBUG
-    data = np.array(data) #DEBUG
     center,normal=algo.compute_plane(data)
     DrawPoint([center],renderer,colors.GetColor3d("DarkGreen"),10.0)
     DrawAxes(renderer,(5,5,5))
     # Draw cloud point from CSV    
-    #DrawPoint(data,renderer,colors.GetColor3d("Tomato"),1.0)
-    DrawPoint(data,renderer,colors.GetColor3d("Tomato"),20.0) #DEBUG
+    DrawPoint(data,renderer,colors.GetColor3d("Tomato"),pointSize)
     # Draw plane
-    DrawPlan(renderer,colors.GetColor3d("Cyan"),center,normal,(30,30,30))
+    DrawPlan(renderer,colors.GetColor3d("Cyan"),center,normal,scaleFactor)
     # Render and interact
     renderWindow.Render()
     renderWindowInteractor.Start()
