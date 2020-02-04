@@ -55,6 +55,7 @@ def DrawPlan(renderer,color,center,normal,scaleFactor):
     # Create a plane
     planeSource = vtk.vtkPlaneSource()
     planeSource.SetCenter(0,0,0)
+    # planeSource.SetNormal(0,1,-4)
     planeSource.SetNormal(normal)
     planeSource.Update()
    
@@ -121,7 +122,7 @@ def main():
     renderWindowInteractor.SetRenderWindow(renderWindow)
     #endregion
 
-    data = [[10,10,0], [-10,-10,0]] #DEBUG
+    data = [[10,10,0], [-6,-6,0]] #DEBUG
     data = np.array(data) #DEBUG
     center,normal=algo.compute_plane(data)
     DrawPoint([center],renderer,colors.GetColor3d("DarkGreen"),10.0)
