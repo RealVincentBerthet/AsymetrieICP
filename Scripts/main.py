@@ -139,7 +139,8 @@ def main():
     renderWindowInteractor = vtk.vtkRenderWindowInteractor()
     renderWindowInteractor.SetRenderWindow(renderWindow)
 
-    center,normal=algo.compute_plane(data,normal)
+    # dist[i] est la distance entre x[i] et son symétrique y[i], donc plus dist est élévé plus on met du rouge
+    center,normal,dist = algo.compute_plane(data, normal)
     DrawPoint([center],renderer,colors.GetColor3d("DarkGreen"),10.0)
     DrawAxes(renderer,(10,10,10))
     # Draw cloud point from CSV    
