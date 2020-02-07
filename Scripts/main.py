@@ -4,6 +4,8 @@ import argparse
 import numpy as np
 import algo
 import os
+import time
+import rendering
 
 def Get_csv_args():
     parser = argparse.ArgumentParser()
@@ -47,108 +49,30 @@ def Get_csv_args():
 
     return data,normal,scaleFactor, pointSize
 
-def DrawAxes(renderer,length):
-    axes = vtk.vtkAxesActor()
-    axes.AxisLabelsOff()
-    transform = vtk.vtkTransform()
-    transform.Translate(0.0, 0.0, 0.0)
-    axes.SetUserTransform(transform)
-    axes.SetTotalLength(length)
-
-    renderer.AddActor(axes)
-
-def DrawPoint(data,renderer,color,pointSize):
-    # Create the geometry of a point (the coordinate)
-    points = vtk.vtkPoints()
-    
-    # Create the topology of the point (a vertex)
-    vertices = vtk.vtkCellArray()
-
-    # We need an an array of point id's for InsertNextCell.
-    for p in data :
-        id = points.InsertNextPoint(p)
-        vertices.InsertNextCell(1)
-        vertices.InsertCellPoint(id)
-
-    # Create a polydata object
-    point = vtk.vtkPolyData()
-
-    # Set the points and vertices we created as the geometry and topology of the polydata
-    point.SetPoints(points)
-    point.SetVerts(vertices)
-
-    # Visualize
-    mapper = vtk.vtkPolyDataMapper()
-    mapper.SetInputData(point)
-
-    actor = vtk.vtkActor()
-    actor.SetMapper(mapper)
-    actor.GetProperty().SetColor(color)
-    actor.GetProperty().SetPointSize(pointSize)
-
-    renderer.AddActor(actor)
-
-def DrawPlan(renderer,color,center,normal,scaleFactor):   
-    # Create a plane
-    planeSource = vtk.vtkPlaneSource()
-    planeSource.SetCenter(0,0,0)
-    planeSource.SetNormal(normal)
-    planeSource.Update()
-   
-    # Scale plane
-    scaleTransform=vtk.vtkTransform()
-    scaleTransform.Scale((scaleFactor))
-    scaleFilter = vtk.vtkTransformPolyDataFilter()
-    scaleFilter.SetInputConnection(planeSource.GetOutputPort())
-    scaleFilter.SetTransform(scaleTransform)
-    scaleFilter.Update()
-
-    # Translate plane
-    translation = vtk.vtkTransform()
-    translation.Translate(center)
-    transformFilter = vtk.vtkTransformPolyDataFilter()
-    transformFilter.SetInputConnection(scaleFilter.GetOutputPort())
-    transformFilter.SetTransform(translation)
-    transformFilter.Update()
-
-    plane = transformFilter.GetOutput()
-
-    # Create a mapper and actor
-    mapper = vtk.vtkPolyDataMapper()
-    mapper.SetInputData(plane)
-
-    actor = vtk.vtkActor()
-    actor.SetMapper(mapper)
-    actor.GetProperty().SetRepresentationToWireframe() #plan unfilled
-    actor.GetProperty().SetColor(color)
-
-    renderer.AddActor(actor)
-
 def main():
+    start_time = time.time()
     data,normal,scaleFactor,pointSize=Get_csv_args()
     ## Rendering
     colors = vtk.vtkNamedColors()
     colors.SetColor("BackgroundColor", [26, 51, 77, 255])
+    colors.SetColor("Plane", [1.0, 1.0, 1.0,0.3])
     # Create a rendering window and renderer
 
     renderer = vtk.vtkRenderer()
     renderer.SetBackground(colors.GetColor3d("BackgroundColor"))
     renderWindow = vtk.vtkRenderWindow()
+    renderWindow.SetSize(640, 480)
     renderWindow.AddRenderer(renderer)
+    
     # Create a renderwindowinteractor
     renderWindowInteractor = vtk.vtkRenderWindowInteractor()
     renderWindowInteractor.SetRenderWindow(renderWindow)
-
     # dist[i] est la distance entre x[i] et son symétrique y[i], donc plus dist est élévé plus on met du rouge
-    center,normal,dist = algo.compute_plane(data, normal)
-    DrawPoint([center],renderer,colors.GetColor3d("DarkGreen"),10.0)
-    DrawAxes(renderer,(10,10,10))
+    rendering.DrawAxes(renderer,(10,10,10))
     # Draw cloud point from CSV    
-    DrawPoint(data,renderer,colors.GetColor3d("Tomato"),pointSize)
-    # Draw plane
-    DrawPlan(renderer,colors.GetColor3d("Cyan"),center,normal,scaleFactor)
-    # Render and interact
-    renderWindow.Render()
+    rendering.DrawPoint(data,renderer,colors.GetColor3d("Tomato"),pointSize)
+    algo.compute_plane(data, normal,renderer,renderWindow,colors,pointSize,scaleFactor)
+    print('time : '+str(round(time.time() - start_time))+' seconds')
     renderWindowInteractor.Start()
 
 
