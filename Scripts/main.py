@@ -66,10 +66,8 @@ def main():
     renderWindow = vtk.vtkRenderWindow()
     renderWindow.SetSize(640, 480)
     #renderWindow.SetFullScreen(1)
-    renderWindow.SetBorders(1)
+    #renderWindow.SetBorders(1)
     renderWindow.AddRenderer(renderer)
-    
-    # Create a renderwindowinteractor
     renderWindowInteractor = vtk.vtkRenderWindowInteractor()
     renderWindowInteractor.SetRenderWindow(renderWindow)
     # dist[i] est la distance entre x[i] et son symétrique y[i], donc plus dist est élévé plus on met du rouge
@@ -77,9 +75,11 @@ def main():
     # Add vtk model
     rendering.AddVtkModel(renderer,vtkFilePath,0.25)
     # Draw cloud point from CSV    
-    rendering.DrawPoint(data,renderer,colors,pointSize)
-    algo.compute_plane(data, normal,renderer,renderWindow,colors,pointSize,scaleFactor)
-    renderWindowInteractor.Start()
+    oldPoints,pointData=rendering.DrawPoint(data,renderer,colors,pointSize)
+    distance=algo.compute_plane(data, normal,renderer,renderWindow,colors,pointSize,scaleFactor)
+    renderer.RemoveActor(oldPoints)
+    rendering.DrawPointDistance(renderer,renderWindowInteractor,distance,data)
+    #renderWindowInteractor.Start()
 
 
 

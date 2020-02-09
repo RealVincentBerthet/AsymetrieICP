@@ -1,7 +1,5 @@
 import vtk
 import numpy as np
-import algo
-import time
 
 def AddLog(renderer,text,fontSize,oldActor=None):
     colors = vtk.vtkNamedColors()
@@ -64,25 +62,26 @@ def DrawPoint(data,renderer,colors,pointSize,oldActor=None):
         vertices.InsertCellPoint(id)
 
     # Create a polydata object
-    point = vtk.vtkPolyData()
+    pointData = vtk.vtkPolyData()
 
     # Set the points and vertices we created as the geometry and topology of the polydata
-    point.SetPoints(points)
-    point.SetVerts(vertices)
+    pointData.SetPoints(points)
+    pointData.SetVerts(vertices)
 
     # Visualize
     mapper = vtk.vtkPolyDataMapper()
-    mapper.SetInputData(point)
+    mapper.SetInputData(pointData)
 
     actor = vtk.vtkActor()
     actor.SetMapper(mapper)
     actor.GetProperty().SetColor(color)
     actor.GetProperty().SetPointSize(pointSize)
+
     if oldActor != None :
         renderer.RemoveActor(oldActor)
     renderer.AddActor(actor)
 
-    return actor
+    return actor,pointData
 
 def DrawPlan(renderer,color,center,normal,scaleFactor,oldActor=None):   
     # Create a plane
@@ -124,3 +123,74 @@ def DrawPlan(renderer,color,center,normal,scaleFactor,oldActor=None):
     renderer.AddActor(actor)
 
     return actor
+
+def DrawPointDistance(renderer,renderWindowInteractor,distance,data):
+    # Create the color map
+    minD=min(distance)
+    print("Distance min : "+str(minD))
+    maxD=max(distance)
+    print("Distance max : "+str(maxD))
+    colorLookupTable = vtk.vtkLookupTable()
+    colorLookupTable.SetTableRange(minD, maxD)
+    colorLookupTable.SetHueRange(0.667, 0.0)
+    colorLookupTable.Build()
+    
+    # Polydata
+    points = vtk.vtkPoints()
+    vertices = vtk.vtkCellArray()
+    for p in data :
+        id = points.InsertNextPoint(p)
+        vertices.InsertNextCell(1)
+        vertices.InsertCellPoint(id)
+
+    pointPolyData = vtk.vtkPolyData()
+    pointPolyData.SetPoints(points)
+    pointPolyData.SetVerts(vertices)
+    
+    # Generate colors for each points
+    colors = vtk.vtkUnsignedCharArray()
+    colors.SetNumberOfComponents(3)
+    colors.SetName("Colors")
+
+    for i in range (pointPolyData.GetNumberOfPoints()): 
+        p= 3*[0.0]
+        pointPolyData.GetPoint(i,p)
+        dcolor = 3*[0.0]
+        colorLookupTable.GetColor(distance[i], dcolor)
+        color=3*[0.0]
+        for j in range(0,3):
+          color[j] = int(255.0 * dcolor[j])
+          
+        colors.InsertNextTypedTuple(color)
+
+    pointPolyData.GetPointData().SetScalars(colors)
+
+    # Create a mapper and actor
+    mapper = vtk.vtkPolyDataMapper()
+    mapper.SetInputData(pointPolyData)
+
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+
+    # create the scalar_bar
+    scalar_bar = vtk.vtkScalarBarActor()
+    scalar_bar.SetMaximumWidthInPixels(50)
+    scalar_bar.SetOrientationToHorizontal()
+    scalar_bar.SetLookupTable(colorLookupTable)
+    scalar_bar.SetTitle("Distance")
+    # create the scalar_bar_widget
+    scalar_bar_widget = vtk.vtkScalarBarWidget()
+    scalar_bar_widget.SetInteractor(renderWindowInteractor)
+    scalar_bar_widget.SetScalarBarActor(scalar_bar)
+    scalar_bar_widget.On()
+
+    # Add the actor to the scene
+    renderer.AddActor(actor)
+    renderWindowInteractor.Start()
+    
+
+
+
+
+
+
