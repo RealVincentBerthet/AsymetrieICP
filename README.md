@@ -10,6 +10,7 @@ This project rely on
 
 This algorithm able to automatically quantify the local asymmetries of bilateral structures in a point cloud
 
+![](Results/demo.gif)
 
 ## Environment configuration (Conda)
 ### Import environment
