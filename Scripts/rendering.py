@@ -13,12 +13,13 @@ def DrawAxes(renderer,length):
 
     renderer.AddActor(axes)
 
-def DrawPoint(data,renderer,color,pointSize,oldActor=None):
+def DrawPoint(data,renderer,colors,pointSize,oldActor=None):
     # Create the geometry of a point (the coordinate)
     points = vtk.vtkPoints()
-    
     # Create the topology of the point (a vertex)
     vertices = vtk.vtkCellArray()
+
+    color=colors.GetColor3d("Tomato")
 
     # We need an an array of point id's for InsertNextCell.
     for p in data :
@@ -41,7 +42,6 @@ def DrawPoint(data,renderer,color,pointSize,oldActor=None):
     actor.SetMapper(mapper)
     actor.GetProperty().SetColor(color)
     actor.GetProperty().SetPointSize(pointSize)
-
     if oldActor != None :
         renderer.RemoveActor(oldActor)
     renderer.AddActor(actor)
@@ -81,6 +81,7 @@ def DrawPlan(renderer,color,center,normal,scaleFactor,oldActor=None):
     actor.SetMapper(mapper)
     #actor.GetProperty().SetRepresentationToWireframe() #plan unfilled
     actor.GetProperty().SetColor(color)
+    actor.GetProperty().SetOpacity(0.5)
 
     if oldActor != None :
         renderer.RemoveActor(oldActor)

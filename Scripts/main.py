@@ -52,16 +52,17 @@ def Get_csv_args():
 def main():
     start_time = time.time()
     data,normal,scaleFactor,pointSize=Get_csv_args()
-    ## Rendering
+    # Rendering
     colors = vtk.vtkNamedColors()
     colors.SetColor("BackgroundColor", [26, 51, 77, 255])
-    colors.SetColor("Plane", [1.0, 1.0, 1.0,0.3])
+    colors.SetColor("Plane", [1.0, 0.0, 1.0,1.0])
     # Create a rendering window and renderer
-
     renderer = vtk.vtkRenderer()
     renderer.SetBackground(colors.GetColor3d("BackgroundColor"))
     renderWindow = vtk.vtkRenderWindow()
     renderWindow.SetSize(640, 480)
+    renderWindow.SetFullScreen(1)
+    renderWindow.SetBorders(1)
     renderWindow.AddRenderer(renderer)
     
     # Create a renderwindowinteractor
@@ -70,7 +71,7 @@ def main():
     # dist[i] est la distance entre x[i] et son symétrique y[i], donc plus dist est élévé plus on met du rouge
     rendering.DrawAxes(renderer,(10,10,10))
     # Draw cloud point from CSV    
-    rendering.DrawPoint(data,renderer,colors.GetColor3d("Tomato"),pointSize)
+    rendering.DrawPoint(data,renderer,colors,pointSize)
     algo.compute_plane(data, normal,renderer,renderWindow,colors,pointSize,scaleFactor)
     print('time : '+str(round(time.time() - start_time))+' seconds')
     renderWindowInteractor.Start()
