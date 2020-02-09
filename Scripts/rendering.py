@@ -3,6 +3,43 @@ import numpy as np
 import algo
 import time
 
+def AddLog(renderer,text,fontSize,oldActor=None):
+    colors = vtk.vtkNamedColors()
+
+    # Create a text actor.
+    actor = vtk.vtkTextActor()
+    actor.SetInput(text)
+    actor.GetTextProperty().SetFontFamilyToArial()
+    actor.GetTextProperty().SetFontSize(fontSize)
+    actor.GetTextProperty().ShadowOn()
+    actor.GetTextProperty().SetShadowOffset(1, 1)
+    actor.GetTextProperty().SetColor(colors.GetColor3d("Cornsilk"))
+    actor.SetDisplayPosition(10, 10)
+
+    if oldActor != None :
+        renderer.RemoveActor(oldActor)
+    renderer.AddActor(actor)
+
+    return actor
+
+
+def AddVtkModel(renderer,vtkFilePath,opacity=1.0):
+    if vtkFilePath != None :
+        reader = vtk.vtkPolyDataReader()
+
+        reader.SetFileName(vtkFilePath)
+        reader.Update()
+        
+        mapper = vtk.vtkDataSetMapper()
+        mapper.SetInputData(reader.GetOutput())
+        actor = vtk.vtkActor()
+        actor.GetProperty().SetOpacity(opacity)
+        actor.SetMapper(mapper)
+ 
+        renderer.AddActor(actor)
+    else :
+        print("No vtk model added")
+
 def DrawAxes(renderer,length):
     axes = vtk.vtkAxesActor()
     axes.AxisLabelsOff()
@@ -18,7 +55,6 @@ def DrawPoint(data,renderer,colors,pointSize,oldActor=None):
     points = vtk.vtkPoints()
     # Create the topology of the point (a vertex)
     vertices = vtk.vtkCellArray()
-
     color=colors.GetColor3d("Tomato")
 
     # We need an an array of point id's for InsertNextCell.

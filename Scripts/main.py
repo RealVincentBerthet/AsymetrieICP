@@ -4,7 +4,6 @@ import argparse
 import numpy as np
 import algo
 import os
-import time
 import rendering
 
 def Get_csv_args():
@@ -14,6 +13,7 @@ def Get_csv_args():
     scaleFactor=(1,1,1)
     pointSize=1.0
     normal=(1,0,0)
+    vtkFilePath=None
 
     if args.filename != None:
         print("CSV Loaded : "+str(args.filename))
@@ -21,16 +21,21 @@ def Get_csv_args():
         print("No CSV loaded used -f argurment")
         quit()
 
-    if os.path.basename(args.filename) == "ventricules.csv" :
+    if os.path.basename(args.filename) == "Ventricules.csv" :
+        vtkFilePath="./Data/Ventricules.vtk"
         scaleFactor=(100,100,100)
         normal=(0,0,1)
     elif os.path.basename(args.filename) == "Visage_symetrique.csv" :
+        vtkFilePath="./Data/Visage_symetrique.vtk"
         scaleFactor=(250,250,250)
     elif os.path.basename(args.filename) == "Visage_symetrique_decimated.csv" :
+        vtkFilePath="./Data/Visage_symetrique_decimated.vtk"
         scaleFactor=(250,250,250)
     elif os.path.basename(args.filename) == "Visage_symetrique_deforme.csv" :
+        vtkFilePath="./Data/Visage_symetrique_deforme.vtk"
         scaleFactor=(250,250,250)
     elif os.path.basename(args.filename) == "Visage_symetrique_deforme_decimated.csv" :
+        vtkFilePath="./Data/Visage_symetrique_deforme_decimated.vtk"
         scaleFactor=(250,250,250)
     elif os.path.basename(args.filename) == "Demo.csv" :
         scaleFactor=(30,30,30)
@@ -47,21 +52,20 @@ def Get_csv_args():
                     tmp.append(float(s))
                 data.append(tmp)
 
-    return data,normal,scaleFactor, pointSize
+    return data,normal,scaleFactor, pointSize,vtkFilePath
 
 def main():
-    start_time = time.time()
-    data,normal,scaleFactor,pointSize=Get_csv_args()
+    data,normal,scaleFactor,pointSize,vtkFilePath=Get_csv_args()
     # Rendering
     colors = vtk.vtkNamedColors()
     colors.SetColor("BackgroundColor", [26, 51, 77, 255])
-    colors.SetColor("Plane", [1.0, 0.0, 1.0,1.0])
+    colors.SetColor("Plane", [255, 0, 255,255])
     # Create a rendering window and renderer
     renderer = vtk.vtkRenderer()
     renderer.SetBackground(colors.GetColor3d("BackgroundColor"))
     renderWindow = vtk.vtkRenderWindow()
     renderWindow.SetSize(640, 480)
-    renderWindow.SetFullScreen(1)
+    #renderWindow.SetFullScreen(1)
     renderWindow.SetBorders(1)
     renderWindow.AddRenderer(renderer)
     
@@ -70,10 +74,11 @@ def main():
     renderWindowInteractor.SetRenderWindow(renderWindow)
     # dist[i] est la distance entre x[i] et son symétrique y[i], donc plus dist est élévé plus on met du rouge
     rendering.DrawAxes(renderer,(10,10,10))
+    # Add vtk model
+    rendering.AddVtkModel(renderer,vtkFilePath,0.25)
     # Draw cloud point from CSV    
     rendering.DrawPoint(data,renderer,colors,pointSize)
     algo.compute_plane(data, normal,renderer,renderWindow,colors,pointSize,scaleFactor)
-    print('time : '+str(round(time.time() - start_time))+' seconds')
     renderWindowInteractor.Start()
 
 

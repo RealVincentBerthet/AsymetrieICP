@@ -2,8 +2,10 @@ import numpy as np
 import scipy.spatial
 import scipy.linalg as la
 import rendering
+import time
 
 def compute_plane(x, n,renderer,renderWindow,colors,pointSize,scaleFactor):
+    start_time = time.time()
     x = np.array(x)
     # Step 0 : Initialise plane
     # moyenne des points clouds pour trouver le centroid
@@ -29,6 +31,7 @@ def compute_plane(x, n,renderer,renderWindow,colors,pointSize,scaleFactor):
     iter=0
     oldPlane=None
     oldCenter=None
+    oldLog=None
     while abs(np.linalg.norm(n-n_prec)) > 0.01 or abs(d-d_prec) > 0.01 :
         n_prec = n
         d_prec = d
@@ -109,7 +112,16 @@ def compute_plane(x, n,renderer,renderWindow,colors,pointSize,scaleFactor):
         print("center : " + str(d_vect.tolist()))
 
         # Draw
-        oldCenter=rendering.DrawPoint([d_vect],renderer,colors.GetColor3d("White"),5,oldCenter)
+        oldCenter=rendering.DrawPoint([d_vect],renderer,colors,5,oldCenter)
         oldPlane=rendering.DrawPlan(renderer,colors.GetColor3d("Plane"),d_vect,n,scaleFactor,oldPlane)
-
+        temp=round(time.time() - start_time)
+        hours = temp//3600
+        temp = temp - 3600*hours
+        minutes = temp//60
+        seconds = temp - 60*minutes
+        if seconds < 10 :
+            seconds="0"+str(seconds)
+            
+        text="Iteration "+str(iter)+"\nNormal "+str(n.tolist())+"\nCenter "+str(d_vect.tolist())+"\nTime : "+str(minutes)+':'+str(seconds)
+        oldLog=rendering.AddLog(renderer,text,14,oldLog)
         renderWindow.Render()
