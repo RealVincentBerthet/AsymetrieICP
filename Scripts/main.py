@@ -14,6 +14,7 @@ def Get_csv_args():
     pointSize=1.0
     normal=(1,0,0)
     vtkFilePath=None
+    epsilon=0.01
 
     if args.filename != None:
         print("CSV Loaded : "+str(args.filename))
@@ -27,12 +28,14 @@ def Get_csv_args():
         normal=(0,0,1)
     elif os.path.basename(args.filename) == "Visage_symetrique.csv" :
         vtkFilePath="./Data/Visage_symetrique.vtk"
+        epsilon=0.1
         scaleFactor=(250,250,250)
     elif os.path.basename(args.filename) == "Visage_symetrique_decimated.csv" :
         vtkFilePath="./Data/Visage_symetrique_decimated.vtk"
         scaleFactor=(250,250,250)
     elif os.path.basename(args.filename) == "Visage_symetrique_deforme.csv" :
         vtkFilePath="./Data/Visage_symetrique_deforme.vtk"
+        epsilon=0.1
         scaleFactor=(250,250,250)
     elif os.path.basename(args.filename) == "Visage_symetrique_deforme_decimated.csv" :
         vtkFilePath="./Data/Visage_symetrique_deforme_decimated.vtk"
@@ -52,10 +55,10 @@ def Get_csv_args():
                     tmp.append(float(s))
                 data.append(tmp)
 
-    return data,normal,scaleFactor, pointSize,vtkFilePath
+    return data,normal,scaleFactor, pointSize,vtkFilePath,epsilon
 
 def main():
-    data,normal,scaleFactor,pointSize,vtkFilePath=Get_csv_args()
+    data,normal,scaleFactor,pointSize,vtkFilePath,epsilon=Get_csv_args()
     # Rendering
     colors = vtk.vtkNamedColors()
     colors.SetColor("BackgroundColor", [26, 51, 77, 255])
@@ -66,7 +69,7 @@ def main():
     renderWindow = vtk.vtkRenderWindow()
     renderWindow.SetSize(640, 480)
     #renderWindow.SetFullScreen(1)
-    #renderWindow.SetBorders(1)
+    renderWindow.SetBorders(1)
     renderWindow.AddRenderer(renderer)
     renderWindowInteractor = vtk.vtkRenderWindowInteractor()
     renderWindowInteractor.SetRenderWindow(renderWindow)
@@ -75,14 +78,10 @@ def main():
     # Add vtk model
     rendering.AddVtkModel(renderer,vtkFilePath,0.25)
     # Draw cloud point from CSV    
-    oldPoints,pointData=rendering.DrawPoint(data,renderer,colors,pointSize)
-    distance=algo.compute_plane(data, normal,renderer,renderWindow,colors,pointSize,scaleFactor)
-    renderer.RemoveActor(oldPoints)
-    rendering.DrawPointDistance(renderer,renderWindowInteractor,distance,data)
-    #renderWindowInteractor.Start()
-
-
-
+    oldPoints=rendering.DrawPoint(data,renderer,colors,pointSize)
+    distance=algo.compute_plane(data, normal,renderer,renderWindow,colors,pointSize,scaleFactor,epsilon)
+    rendering.AddDistance(renderer,renderWindowInteractor,distance,oldPoints)
+    renderWindowInteractor.Start()
 
 
 if __name__ == '__main__':

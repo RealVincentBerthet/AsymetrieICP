@@ -81,7 +81,7 @@ def DrawPoint(data,renderer,colors,pointSize,oldActor=None):
         renderer.RemoveActor(oldActor)
     renderer.AddActor(actor)
 
-    return actor,pointData
+    return actor
 
 def DrawPlan(renderer,color,center,normal,scaleFactor,oldActor=None):   
     # Create a plane
@@ -124,7 +124,7 @@ def DrawPlan(renderer,color,center,normal,scaleFactor,oldActor=None):
 
     return actor
 
-def DrawPointDistance(renderer,renderWindowInteractor,distance,data):
+def AddDistance(renderer,renderWindowInteractor,distance,actor):
     # Create the color map
     minD=min(distance)
     print("Distance min : "+str(minD))
@@ -134,18 +134,9 @@ def DrawPointDistance(renderer,renderWindowInteractor,distance,data):
     colorLookupTable.SetTableRange(minD, maxD)
     colorLookupTable.SetHueRange(0.667, 0.0)
     colorLookupTable.Build()
-    
-    # Polydata
-    points = vtk.vtkPoints()
-    vertices = vtk.vtkCellArray()
-    for p in data :
-        id = points.InsertNextPoint(p)
-        vertices.InsertNextCell(1)
-        vertices.InsertCellPoint(id)
-
-    pointPolyData = vtk.vtkPolyData()
-    pointPolyData.SetPoints(points)
-    pointPolyData.SetVerts(vertices)
+   
+    # Get Points
+    pointPolyData=actor.GetMapper().GetInput()
     
     # Generate colors for each points
     colors = vtk.vtkUnsignedCharArray()
@@ -165,13 +156,6 @@ def DrawPointDistance(renderer,renderWindowInteractor,distance,data):
 
     pointPolyData.GetPointData().SetScalars(colors)
 
-    # Create a mapper and actor
-    mapper = vtk.vtkPolyDataMapper()
-    mapper.SetInputData(pointPolyData)
-
-    actor = vtk.vtkActor()
-    actor.SetMapper(mapper)
-
     # create the scalar_bar
     scalar_bar = vtk.vtkScalarBarActor()
     scalar_bar.SetMaximumWidthInPixels(50)
@@ -185,8 +169,9 @@ def DrawPointDistance(renderer,renderWindowInteractor,distance,data):
     scalar_bar_widget.On()
 
     # Add the actor to the scene
-    renderer.AddActor(actor)
     renderWindowInteractor.Start()
+    renderWindowInteractor.Disable() #start required or no bar actor show
+    
     
 
 

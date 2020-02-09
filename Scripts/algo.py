@@ -4,7 +4,7 @@ import scipy.linalg as la
 import rendering
 import time
 
-def compute_plane(x, n,renderer,renderWindow,colors,pointSize,scaleFactor):
+def compute_plane(x, n,renderer,renderWindow,colors,pointSize,scaleFactor,epsilon=0.01):
     start_time = time.time()
     x = np.array(x)
     # Step 0 : Initialise plane
@@ -32,12 +32,11 @@ def compute_plane(x, n,renderer,renderWindow,colors,pointSize,scaleFactor):
     oldPlane=None
     oldCenter=None
     oldLog=None
-    while abs(np.linalg.norm(n-n_prec)) > 0.01 or abs(d-d_prec) > 0.01 :
+    while abs(np.linalg.norm(n-n_prec)) > epsilon or abs(d-d_prec) > epsilon :
         n_prec = n
         d_prec = d
 
         iter = iter + 1
-        #print("iter " + str(iter))
 
         # Step 1 :
 
@@ -108,8 +107,9 @@ def compute_plane(x, n,renderer,renderWindow,colors,pointSize,scaleFactor):
         # Calcul d
         d_vect = 1/2 * (xg+yg)
         d = d_vect @ n
-        #print("normal : " + str(n.tolist()))
-        #print("center : " + str(d_vect.tolist()))
+        print("iter " + str(iter))
+        print("normal : " + str(n.tolist()))
+        print("center : " + str(d_vect.tolist()))
 
         # Draw
         #oldCenter=rendering.DrawPoint([d_vect],renderer,colors,5,oldCenter)

@@ -3,7 +3,14 @@
 
 *QUERO Benoit*
 ## Introduction
-**@TODO**
+This project rely on 
+“An algorithm to map asymmetries of bilateral objects in point clouds” 
+
+*- Benoît Combès, Robin Hennessy, John Waddington, Neil Roberts, Sylvain Prima*
+
+This algorithm able to automatically quantify the local asymmetries of bilateral structures in a point cloud
+
+
 ## Environment configuration (Conda)
 ### Import environment
 You can directly use exported environment in `./Conda/` by running the following command `conda env create -f Conda/win.yml` 
@@ -51,39 +58,43 @@ The previous environment contains this packages :
 #### [Ventricules.csv](./Data/Ventricules.csv)
 
 
-| ![](./Results/ventricules_0.jpg) | ![](./Results/ventricules_1.jpg) |  ![](./Results/ventricules_3.jpg)
+| ![](./Results/ventricules_0.jpg) | ![](./Results/ventricules_1.jpg) |  ![](./Results/ventricules_2.jpg)
 |:-:|:-:|:-:| 
-| Left | Front | Right |
+
 
 
 #### [Visage_symetrique.csv](./Data/Visage_symetrique.csv)
 
 
-| ![](./Results/visage_symetrique_0.jpg) | ![](./Results/visage_symetrique_1.jpg) |  ![](./Results/visage_symetrique_3.jpg)
+| ![](./Results/visage_symetrique_0.jpg) | ![](./Results/visage_symetrique_1.jpg) |  ![](./Results/visage_symetrique_2.jpg)
 |:-:|:-:|:-:| 
-| Left | Front | Right |
+
 
 
 #### [Visage_symetrique_decimated.csv](./Data/Visage_symetrique_decimated.csv)
 
 
-| ![](./Results/visage_symetrique_decimated_0.jpg) | ![](./Results/visage_symetrique_decimated_1.jpg) |  ![](./Results/visage_symetrique_decimated_3.jpg)
+| ![](./Results/visage_symetrique_decimated_0.jpg) | ![](./Results/visage_symetrique_decimated_1.jpg) |  ![](./Results/visage_symetrique_decimated_2.jpg)
 |:-:|:-:|:-:| 
-| Left | Front | Right |
+
 
 
 #### [Visage_symetrique_deforme.csv](./Data/Visage_symetrique_deforme.csv)
 
 
-| ![](./Results/visage_symetrique_deforme_0.jpg) | ![](./Results/visage_symetrique_deforme_1.jpg) |  ![](./Results/visage_symetrique_deforme_3.jpg)
+| ![](./Results/visage_symetrique_deforme_0.jpg) | ![](./Results/visage_symetrique_deforme_1.jpg) |  ![](./Results/visage_symetrique_deforme_2.jpg)
 |:-:|:-:|:-:| 
-| Left | Front | Right |
+
 
 
 #### [Visage_symetrique_deforme_decimated.csv](./Data/Visage_symetrique_deforme_decimated.csv)
 
 
-| ![](./Results/visage_symetrique_deforme_decimated_0.jpg) | ![](./Results/visage_symetrique_deforme_decimated_1.jpg) |  ![](./Results/visage_symetrique_deforme_decimated_3.jpg)
+| ![](./Results/visage_symetrique_deforme_decimated_0.jpg) | ![](./Results/visage_symetrique_deforme_decimated_1.jpg) |  ![](./Results/visage_symetrique_deforme_decimated_2.jpg)
 |:-:|:-:|:-:| 
-| Left | Front | Right |
+
+
+
+
+
 
