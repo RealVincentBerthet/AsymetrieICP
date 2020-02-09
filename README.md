@@ -31,7 +31,7 @@ The previous environment contains this packages :
 
 [algo.py](./Scripts/algo.py) contains the implementation of algorithm from `./Docs/`
 
-[readerVtk.py](./Scripts/readerVtk.py) 
+[readerVtk.py](./Scripts/readerVtk.py) display a VTK model
 
 
 `python .\Scripts\main.py -f .\data\Visage_symetrique_decimated.csv`
@@ -39,10 +39,10 @@ The previous environment contains this packages :
 ### VTK Model
 
 
-| ![](./Results/ventricules.jpg) | ![](./Results/visage_symetrique.jpg) |  ![](./Results/Visage_symetrique_decimated.jpg) | 
+| ![](./Results/ventricules.jpg) | ![](./Results/visage_symetrique.jpg) |  ![](./Results/visage_symetrique_decimated.jpg) | 
 |:-:|:-:|:-:| 
 | [Ventricules.vtk](./Data/Ventricules.vtk) | [Visage_symetrique.vtk](./Data/Visage_symetrique.vtk) | [Visage_symetrique_decimated.vtk](./Data/Visage_symetrique_decimated.vtk) |
-| ![](./Results/Visage_symetrique_deforme.jpg) | ![](./Results/Visage_symetrique_deforme_decimated.jpg) | |
+| ![](./Results/visage_symetrique_deforme.jpg) | ![](./Results/visage_symetrique_deforme_decimated.jpg) | |
 | [Visage_symetrique_deforme.vtk](./Data/Visage_symetrique_deforme.vtk) | [Visage_symetrique_deforme_decimated.vtk](./Data/Visage_symetrique_deforme_decimated.vtk) | |
 
 
